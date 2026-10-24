@@ -73,10 +73,15 @@ mark { background: var(--mark); color: inherit; padding: 0 1px; }
 .nav .btn small { display: block; color: var(--muted); font-size: 12px; }
 .nav .btn span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav .next { text-align: right; }
+/* 2026-10-25：.drawer 的 display:flex 會蓋過 hidden 屬性（獨立網頁上目錄永遠關不掉），這行讓 hidden 一定生效 */
+[hidden] { display: none !important; }
 .drawer { position: fixed; inset: 0; z-index: 20; display: flex; }
+.panel-head { position: sticky; top: 0; z-index: 1; background: var(--paper); display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 0 10px; }
+.panel-head b { font-size: 15px; }
 .drawer .shade { flex: 1; background: rgba(0,0,0,0.35); }
 .drawer .panel { width: min(26em, 88vw); background: var(--paper); border-right: 1px solid var(--rule); overflow-y: auto; order: -1;
-  padding-block: calc(env(safe-area-inset-top, 0px) + 14px) calc(env(safe-area-inset-bottom, 0px) + 20px);
+  padding-block: 0 calc(env(safe-area-inset-bottom, 0px) + 20px);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; }
 .panel h5 { margin: 1.2em 0 0.4em; font-size: 12px; letter-spacing: 0.12em; color: var(--muted); font-weight: 600; }
 .panel a { display: flex; gap: 8px; padding: 7px 6px; color: var(--fg); text-decoration: none; border-radius: 4px; font-size: 15px; line-height: 1.45; }
@@ -108,6 +113,7 @@ mark { background: var(--mark); color: inherit; padding: 0 1px; }
 <div class="drawer" id="drawer" hidden>
   <div class="shade" id="shade"></div>
   <nav class="panel" aria-label="目錄">
+    <div class="panel-head"><b>目錄與搜尋</b><button class="btn" id="closeBtn" aria-label="關閉目錄">✕ 關閉</button></div>
     <input id="q" type="search" placeholder="搜尋全文（例：渴愛、二箭、業）" autocomplete="off">
     <div class="hits" id="hits"></div>
     <div id="toc"></div>
@@ -212,6 +218,7 @@ document.addEventListener('click', e => {
 });
 $('tocBtn').onclick = () => openDrawer(true);
 $('shade').onclick = () => openDrawer(false);
+$('closeBtn').onclick = () => openDrawer(false);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') openDrawer(false);
   if (!$('drawer').hidden || e.target.tagName === 'INPUT') return;
